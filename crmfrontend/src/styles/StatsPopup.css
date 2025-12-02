@@ -1,0 +1,94 @@
+.statsOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.statsModalWide {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 0;
+}
+
+.statsChartContainer {
+  margin-bottom: 40px;
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background-color: #fafafa;
+  min-width: 0;
+}
+
+.statsChartTitle {
+  margin-bottom: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.statsDetails {
+  margin-top: 15px;
+  font-size: 14px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+.statsButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.statsButton {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.statsButton:hover {
+  background-color: #0056b3;
+}
+
+.statsNoData {
+  text-align: center;
+  padding: 20px;
+}
+
+.statsOverallChart {
+  width: 100%;
+  height: 300px;
+  margin-bottom: 30px;
+  min-width: 0;
+  min-height: 300px;
+}
+
+.statsOverallChartTitle {
+  margin-bottom: 10px;
+}
+
+.statsIndividualChart {
+  width: 100%;
+  height: 250px;
+  min-width: 0;
+  min-height: 250px;
+}
+

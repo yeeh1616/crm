@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-create-users-table" author="crm-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
+        <createTable tableName="users">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password_hash" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="idx_user_username" tableName="users">
+            <column name="username"/>
+        </createIndex>
+        <createIndex indexName="idx_user_email" tableName="users">
+            <column name="email"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="008-create-segments-table" author="crm-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="segments"/>
+            </not>
+        </preConditions>
+        <createTable tableName="segments">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="002-create-customers-table" author="crm-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="customers"/>
+            </not>
+        </preConditions>
+        <createTable tableName="customers">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="phone" type="VARCHAR(50)"/>
+            <column name="company" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="source" type="VARCHAR(100)"/>
+            <column name="country" type="VARCHAR(100)"/>
+            <column name="city" type="VARCHAR(100)"/>
+            <column name="tags" type="JSON"/>
+            <column name="segment_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_customer_segment" references="segments(id)"/>
+            </column>
+            <column name="owner_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_customer_owner" references="users(id)"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME"/>
+            <column name="deleted_at" type="DATETIME"/>
+        </createTable>
+        <createIndex indexName="idx_customer_email" tableName="customers">
+            <column name="email"/>
+        </createIndex>
+        <createIndex indexName="idx_customer_owner" tableName="customers">
+            <column name="owner_id"/>
+        </createIndex>
+        <createIndex indexName="idx_customer_deleted" tableName="customers">
+            <column name="deleted_at"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="011-create-customer_tag-table" author="crm-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="customer_tag"/>
+            </not>
+        </preConditions>
+        <createTable tableName="customer_tag">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="003-create-leads-table" author="crm-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="leads"/>
+            </not>
+        </preConditions>
+        <createTable tableName="leads">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="BIGINT">
+            </column>
+            <column name="contact_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contact_email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contact_phone" type="VARCHAR(50)"/>
+            <column name="stage" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source" type="VARCHAR(100)"/>
+            <column name="owner_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_lead_owner" references="users(id)"/>
+            </column>
+            <column name="value" type="DECIMAL(19,2)"/>
+            <column name="expected_close_date" type="DATE"/>
+            <column name="converted_at" type="DATETIME"/>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME"/>
+        </createTable>
+        <createIndex indexName="idx_lead_customer" tableName="leads">
+            <column name="customer_id"/>
+        </createIndex>
+        <createIndex indexName="idx_lead_owner" tableName="leads">
+            <column name="owner_id"/>
+        </createIndex>
+        <createIndex indexName="idx_lead_stage" tableName="leads">
+            <column name="stage"/>
+        </createIndex>
+        <createIndex indexName="idx_lead_status" tableName="leads">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="013-customer-lead-cascade-delete" author="crm-system">
+        <addForeignKeyConstraint
+                baseTableName="leads"
+                baseColumnNames="customer_id"
+                referencedTableName="customers"
+                referencedColumnNames="id"
+                constraintName="fk_lead_customer"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="004-create-activities-table" author="crm-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="activities"/>
+            </not>
+        </preConditions>
+        <createTable tableName="activities">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lead_id" type="BIGINT">
+            </column>
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT"/>
+            <column name="outcome" type="VARCHAR(255)"/>
+            <column name="next_followup_at" type="DATETIME"/>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sent_reminder" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="subscribed_reminder" type="BOOLEAN" defaultValueBoolean="true"/>
+        </createTable>
+        <createIndex indexName="idx_activity_lead" tableName="activities">
+            <column name="lead_id"/>
+        </createIndex>
+        <createIndex indexName="idx_activity_next_followup" tableName="activities">
+            <column name="next_followup_at"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="007-create-scores-table" author="crm-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="scores"/>
+            </not>
+        </preConditions>
+        <createTable tableName="scores">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_score_customer" references="customers(id)"/>
+            </column>
+            <column name="score" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reason" type="VARCHAR(255)"/>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="idx_score_customer" tableName="scores">
+            <column name="customer_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="010-create-idempotency-key-table" author="crm-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="idempotency_key"/>
+            </not>
+        </preConditions>
+        <createTable tableName="idempotency_key">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="key" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_idempotency_user" references="users(id)"/>
+            </column>
+            <column name="request_hash" type="VARCHAR(255)"/>
+            <column name="response_body" type="TEXT"/>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="idx_idempotency_key" tableName="idempotency_key">
+            <column name="key"/>
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="011-create-tags-table" author="crm-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tags"/>
+            </not>
+        </preConditions>
+        <createTable tableName="tags">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="012-create-customer-tag-table" author="crm-system">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="customer_tag"/>
+            </not>
+        </preConditions>
+        <createTable tableName="customer_tag">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_customer_tag_customer"
+                             references="customers(id)"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_customer_tag_tag"
+                             references="tags(id)"/>
+            </column>
+        </createTable>
+        <createIndex tableName="customer_tag" indexName="idx_customer_tag_customer">
+            <column name="customer_id"/>
+        </createIndex>
+        <createIndex tableName="customer_tag" indexName="idx_customer_tag_tag">
+            <column name="tag_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="014-lead-activity-cascade-delete" author="crm-system">
+        <addForeignKeyConstraint
+                baseTableName="activities"
+                baseColumnNames="lead_id"
+                referencedTableName="leads"
+                referencedColumnNames="id"
+                constraintName="fk_activity_lead"
+                onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

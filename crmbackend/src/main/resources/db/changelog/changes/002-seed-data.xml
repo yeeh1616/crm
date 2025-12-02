@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="002-insert-admin-user" author="crm-system">
+        <insert tableName="users">
+            <column name="username" value="admin"/>
+            <column name="email" value="admin@crm.com"/>
+            <column name="password_hash" value="$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"/> <!-- password: admin123 -->
+            <column name="role" value="ADMIN"/>
+            <column name="created_at" valueComputed="NOW()"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="002-insert-users" author="crm-system">
+        <sql>
+            INSERT INTO users (username, email, password_hash, role, created_at) VALUES
+            ('user1', 'user1@crm.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', NOW()),
+            ('user2', 'user2@crm.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', NOW()),
+            ('user3', 'user3@crm.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', NOW()),
+            ('user4', 'user4@crm.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', NOW()),
+            ('user5', 'user5@crm.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', NOW()),
+            ('user6', 'user6@crm.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', NOW()),
+            ('user7', 'user7@crm.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', NOW()),
+            ('user8', 'user8@crm.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', NOW()),
+            ('user9', 'user9@crm.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', NOW()),
+            ('user10', 'user10@crm.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', NOW());
+        </sql>
+    </changeSet>
+
+    <changeSet id="004-insert-sample-segments" author="crm-system">
+        <sql>
+            INSERT INTO segments (name)
+            VALUES
+            ('New Leads'),
+            ('Engaged Customers'),
+            ('High-Value Customers'),
+            ('At-Risk Customers'),
+            ('Prospects by Source');
+        </sql>
+    </changeSet>
+
+    <changeSet id="002-insert-customers" author="crm-system">
+        <sql>
+            INSERT INTO customers
+            (name, email, phone, company, title, source, country, city, tags, segment_id, owner_id, created_at, updated_at)
+            SELECT
+            CONCAT('Customer ', c.num, ' for User ', u.id) as name,
+            CONCAT('customer', c.num, '_user', u.id, '@example.com') as email,
+            CONCAT('+1-555-', LPAD(c.num, 4, '0')) as phone,
+            CONCAT('Company ', c.num) as company,
+            'Manager' as title,
+            CASE (c.num % 3)
+            WHEN 0 THEN 'Website'
+            WHEN 1 THEN 'Referral'
+            ELSE 'Social Media'
+            END as source,
+            'USA' as country,
+            CASE (c.num % 5)
+            WHEN 0 THEN 'New York'
+            WHEN 1 THEN 'Los Angeles'
+            WHEN 2 THEN 'Chicago'
+            WHEN 3 THEN 'Houston'
+            ELSE 'Phoenix'
+            END as city,
+            JSON_ARRAY('Tag1', 'Tag2') as tags,
+            FLOOR(1 + RAND() * 5) as segment_id,
+            u.id as owner_id,
+            NOW() as created_at,
+            NOW() as updated_at
+            FROM users u
+            CROSS JOIN (
+            SELECT 1 as num UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
+            UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+            ) c
+            WHERE u.role = 'USER';
+        </sql>
+    </changeSet>
+
+    <changeSet id="003-insert-sample-leads" author="crm-system">
+        <sql>
+            INSERT INTO leads (
+            contact_name, contact_email, contact_phone, stage, status, source, owner_id, customer_id, value, expected_close_date, converted_at, created_at, updated_at
+            )
+            SELECT
+            CONCAT('Lead ', l.num, ' for Customer ', c.id) as contact_name,
+            CONCAT('lead', l.num, '_customer', c.id, '@example.com') as contact_email,
+            CONCAT('+1-555-', LPAD(l.num + 1000, 4, '0')) as contact_phone,
+            CASE (l.num % 6)
+            WHEN 0 THEN 'NEW'
+            WHEN 1 THEN 'CONTACTED'
+            WHEN 2 THEN 'QUALIFIED'
+            WHEN 3 THEN 'PROPOSAL'
+            WHEN 4 THEN 'WON'
+            ELSE 'LOST'
+            END as stage,
+            CASE (l.num % 3)
+            WHEN 0 THEN 'ACTIVE'
+            WHEN 1 THEN 'ACTIVE'
+            ELSE 'ARCHIVED'
+            END as status,
+            CASE (l.num % 3)
+            WHEN 0 THEN 'Website'
+            WHEN 1 THEN 'Referral'
+            ELSE 'Social Media'
+            END as source,
+            c.owner_id as owner_id,
+            c.id as customer_id,
+            1000.00 * l.num as value,
+            DATE_ADD(NOW(), INTERVAL l.num DAY) as expected_close_date,
+            CASE WHEN (l.num % 5 = 0) THEN DATE_SUB(NOW(), INTERVAL l.num DAY) ELSE NULL END as converted_at,
+            NOW() as created_at,
+            NOW() as updated_at
+            FROM customers c
+            CROSS JOIN (
+            SELECT 1 as num UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
+            ) l;
+        </sql>
+    </changeSet>
+
+    <changeSet id="002-insert-activities" author="crm-system">
+        <sql>
+            INSERT INTO activities (lead_id, type, content, outcome, created_at)
+            SELECT
+            l.id AS lead_id,
+            CASE (l.id % 4)
+            WHEN 0 THEN 'CALL'
+            WHEN 1 THEN 'EMAIL'
+            WHEN 2 THEN 'MEETING'
+            ELSE 'NOTE'
+            END as type,
+            CONCAT('Activity for lead ', l.id) as content,
+            'Positive' as outcome,
+            NOW() as created_at
+            FROM leads l;
+        </sql>
+    </changeSet>
+
+    <changeSet id="005-insert-default-tags" author="crm-system">
+        <sql>
+            INSERT INTO tags (name)
+            VALUES
+            ('Default Customer Status'),
+            ('Default Engagement Level'),
+            ('Default Interest'),
+            ('Default Region'),
+            ('Default Campaign Source');
+        </sql>
+    </changeSet>
+
+
+</databaseChangeLog>
+

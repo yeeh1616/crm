@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+  database:
+    image: mysql:8.1
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: crmdb
+      MYSQL_USER: abc
+      MYSQL_PASSWORD: 123
+      MYSQL_ROOT_PASSWORD: root123
+    ports:
+#      - "3306:3306"
+      - "8081:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "abc", "-p123"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis_data:
+
+#  application:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      database:
+#        condition: service_healthy
+#      rabbitmq:
+#        condition: service_healthy

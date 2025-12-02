@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: crm
+
+  datasource:
+    url: jdbc:mysql://database:3306/crmdb
+    username: root
+    password: root123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+jwt:
+  secret: ${APP_JWT_SECRET:ZmFrZS1qd3Qtc2VjcmV0LXNob3VsZC1iZS1iYXNlNjQ=}
+  expiration: ${APP_JWT_EXPIRATION:3600000000}
+
+logging:
+  level:
+    org.springframework.security: INFO
+    com.zaxxer.hikari: DEBUG

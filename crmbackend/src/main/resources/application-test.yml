@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: crm
+
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+  mail:
+    host: none
+jwt:
+  secret: ${APP_JWT_SECRET:ZmFrZS1qd3Qtc2VjcmV0LXNob3VsZC1iZS1iYXNlNjQ=}
+  expiration: ${APP_JWT_EXPIRATION:3600000000}
+
+logging:
+  level:
+    org.springframework.security: INFO
+    com.zaxxer.hikari: DEBUG
+    org.springframework.amqp: INFO
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
