@@ -54,7 +54,7 @@ npm install
 
 2. Start development server:
 ```bash
-npm start
+npm run dev
 ```
 
 Frontend will be available at: `http://localhost:3000`
@@ -229,7 +229,7 @@ java -jar target/crmbackend-0.0.1-SNAPSHOT.jar
 **Frontend:**
 ```bash
 cd crmfrontend
-npm run build
+npm run dev
 # Serve the build/ directory with a web server
 ```
 
@@ -241,15 +241,72 @@ Edit `crmbackend/src/main/resources/application.yml`:
 
 ```yaml
 spring:
+  application:
+    name: crm
+
   datasource:
-    url: jdbc:mysql://localhost:8081/crmdb
+    url: jdbc:mysql://localhost:3306/crmdb
     username: root
     password: root123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: false
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: admin
-    password: admin123
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:admin123}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: [your email address]
+    password: [your app password]
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+jwt:
+  secret: ${APP_JWT_SECRET:ZmFrZS1qd3Qtc2VjcmV0LXNob3VsZC1iZS1iYXNlNjQ=}
+  expiration: ${APP_JWT_EXPIRATION:3600000000}
+
+logging:
+  level:
+    org.springframework.security: INFO
+    com.zaxxer.hikari: DEBUG
+    org.springframework.amqp: INFO
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
 ```
 
 ### Frontend Configuration
